@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A* and Dijkstra Algorithms</title>
+<script>
+// A simple Node class for our graph
+class Node {
+    constructor(x, y, walkable) {
+        this.x = x;
+        this.y = y;
+        this.walkable = walkable;
+        this.gCost = 0;
+        this.hCost = 0;
+        this.fCost = function() {
+            return this.gCost + this.hCost;
+        };
+        this.parent = null;
+    }
+}
+// Heuristic function for A*
+function heuristic(nodeA, nodeB) {
+    return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);
+}
+// A* algorithm implementation
+function aStar(startNode, endNode) {
+    let openSet = [startNode];
+    let closedSet = [];
+    startNode.gCost = 0;
+    startNode.hCost = heuristic(startNode, endNode);
+    while (openSet.length > 0) {
+        let currentNode = openSet.reduce((a, b) => a.fCost() < b.fCost() ? a : b);
+        if (currentNode === endNode) {
+            return reconstructPath(endNode);
+        }
+        openSet = openSet.filter(node => node !== currentNode);
+        closedSet.push(currentNode);
+        getNeighbors(currentNode).forEach(neighbor => {
+            if (!neighbor.walkable || closedSet.includes(neighbor)) {
+                return;
+            }
+            let tentativeGCost = currentNode.gCost + 1; // Assuming uniform cost for simplicity
+            if (tentativeGCost < neighbor.gCost || !openSet.includes(neighbor)) {
+                neighbor.gCost = tentativeGCost;
+                neighbor.hCost = heuristic(neighbor, endNode);
+                neighbor.parent = currentNode;
+                if (!openSet.includes(neighbor)) {
+                    openSet.push(neighbor);
+                }
+            }
+        });
+    }
+    return [];
+}
+// Dijkstra's algorithm implementation
+function dijkstra(startNode, endNode) {
+    let unvisited = [startNode];
+    startNode.gCost = 0;
+    while (unvisited.length > 0) {
+        let currentNode = unvisited.reduce((a, b) => a.gCost < b.gCost ? a : b);
+        if (currentNode === endNode) {
+            return reconstructPath(endNode);
+        }
+        unvisited = unvisited.filter(node => node !== currentNode);
+        getNeighbors(currentNode).forEach(neighbor => {
+            if (!neighbor.walkable || neighbor.gCost === 0) {
+                return;
+            }
+            let tentativeGCost = currentNode.gCost + 1; // Assuming uniform cost for simplicity
+            if (tentativeGCost < neighbor.gCost) {
+                neighbor.gCost = tentativeGCost;
+                neighbor.parent = currentNode;
+                unvisited.push(neighbor);
+            }
+        });
+    }
+    return [];
+}
+// Helper function to reconstruct the path from endNode to startNode
+function reconstructPath(endNode) {
+    let path = [];
+    let currentNode = endNode;
+    while (currentNode != null) {
+        path.push(currentNode);
+        currentNode = currentNode.parent;
+    }
+    return path.reverse();
+}
+// Helper function to get the neighbors of a node
+function getNeighbors(node) {
+    let neighbors = [];
+    // Add logic here to get neighbors of the node from the grid
+    // For example, you can add the nodes that are directly adjacent (up, down, left, right)
+    return neighbors;
+}
+// Example usage:
+// Define a grid, start node, and end node here
+// Call aStar(startNode, endNode) or dijkstra(startNode, endNode) to find the path
+</script>
+</head>
+<body>
+<h1>A* and Dijkstra Algorithms</h1>
+<!-- Add any additional HTML here, such as a grid representation or controls -->
+</body>
+</html>
